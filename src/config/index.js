@@ -1,3 +1,3 @@
 export const config = {
-    apiUrl: 'https://cloud2020-backend.herokuapp.com/api'
+    apiUrl: 'http://localhost:9000/api'
 };
