@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {MapContainer as LeafletMap, Marker, Popup, TileLayer} from 'react-leaflet';
+import {Circle, MapContainer as LeafletMap, Marker, Popup, TileLayer} from 'react-leaflet';
 import CanvasJSReact from '../../assets/canvasjs.react';
 import SensorService from "../../services/sensor.service";
 import Table from 'react-bootstrap/Table';
@@ -7,17 +7,7 @@ import Timer from "../Timer/Timer";
 
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
-const options = {
-    animationEnabled: true,
-    exportEnabled: true,
-    theme: "light2", //"light1", "dark1", "dark2"
-    title: {
-        text: "Histogram"
-    },
-    axisY: {
-        includeZero: true
-    }
-};
+
 
 
 const generateColors = (max = 150) => {
@@ -61,6 +51,7 @@ export default function SensorMap() {
             const lastCrossingSession = await SensorService.getLastCrossingSession({vm_name: _vName})
             const crossingHistogramData = await SensorService.getHistogramDataFromCrossingSessions({vm_name: _vName})
             updateSensorData(lastCrossingSession.data);
+            updateSensorHistogramData(crossingHistogramData.data);
             console.log(lastCrossingSession)
             console.log(crossingHistogramData)
         }
@@ -104,8 +95,31 @@ export default function SensorMap() {
                         {
                             console.log(_vmName)
                             console.log(sensorInformation)
-                           return sensorInformation.filter((_i) => _i.vm_name === _vmName)
+                            const _s =  sensorInformation.filter((_i) => _i.vm_name === _vmName);
+                            console.log(_s[0].location)
+                           return _s
                                 .map((_information, index) => {
+                                    const options = {
+                                        animationEnabled: true,
+                                        exportEnabled: true,
+                                        theme: "light2", //"light1", "dark1", "dark2"
+                                        title: {
+                                            text: "Histogram"
+                                        },
+                                        axisY: {
+                                            includeZero: true
+                                        },
+                                        data: [{
+                                            type: "column", //change type to bar, line, area, pie, etc
+                                            //indexLabel: "{y}", //Shows y value on all Data Points
+                                            indexLabelFontColor: "#5A5757",
+                                            indexLabelPlacement: "outside",
+                                            dataPoints: sensorHistogramData.map((_hData) => {
+                                                return {label: _hData.label, y: _hData.red}
+                                            })
+                                        }]
+                                    };
+
                                 return <Marker position={_information.location} key={index}>
                                     <Popup minWidth="800">
                                         {sensorData.length > 0 &&
@@ -136,7 +150,9 @@ export default function SensorMap() {
                                                 <td>{sensorData[indexVM].green.length}</td>}
                                             </tr>
                                             </tbody>
+                                            <CanvasJSChart options={options}/>
                                         </Table>
+
                                         }
                                     </Popup>
                                 </Marker>
