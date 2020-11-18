@@ -66,7 +66,7 @@ export default function SensorMap() {
     const handleUpdateData = async (_vmDict = new Map()) => {
 
         if (_vmDict.size === 0)
-            _vmDict = vmDict
+            _vmDict = vmDict;
 
         let _tmp = new Map();
 
@@ -89,7 +89,6 @@ export default function SensorMap() {
     useEffect(() => {
         async function fetchData() {
             const sensorInformation = await SensorService.getSensorInformation()
-            console.log(sensorInformation)
 
             let _vmDict = new Map()
             let _vmNames = []
